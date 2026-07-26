@@ -1,7 +1,35 @@
-from flask import Flask, render_template
+import sqlite3
+import os
+
+from flask import Flask, render_template, jsonify
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL")
 
 app = Flask(__name__)
 
-@app.route("/")# es un decorador que indica que la función hello_world() se ejecutará cuando se acceda a la ruta raíz del servidor web.
-def hello_world():
-    return render_template("index.html")# devuelve el contenido de la plantilla HTML "index.html" como respuesta a la solicitud HTTP.
+def get_db():
+    db = sqlite3.connect(DB_URL)
+    #db.row_factory = sqlite3.Row
+    return db
+
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("base.html")
+
+@app.route("/posts", methods=["GET"])
+def list_posts():
+    connection = get_db()
+    posts_data = connection.execute("SELECT * FROM post").fetchall()
+    connection.close()
+    return render_template("index.html", posts_list=posts_data)
+
+
+@app.route("/api/posts", methods=["GET"])
+def list_posts_json():
+    connection = get_db()
+    posts_data = connection.execute("SELECT * FROM post").fetchall()
+    connection.close()
+    return jsonify(post_data=posts_data)

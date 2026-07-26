@@ -6,6 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <p>hola con todos</p>
+    {% for row in posts_list %}
+        <p>{{ row["title"] }} </p>
+    {% endfor %}
 </body>
 </html>
